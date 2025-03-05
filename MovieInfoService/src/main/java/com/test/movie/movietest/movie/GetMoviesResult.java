@@ -1,6 +1,6 @@
 package com.test.movie.movietest.movie;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
-public record GetMoviesResult(List<Movie> movies) {
+public record GetMoviesResult(Page<Movie> movies) {
 }
