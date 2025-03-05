@@ -5,17 +5,11 @@ import com.test.movie.movietest.network.NetworkConnector;
 import com.test.movie.movietest.network.SearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -51,7 +45,6 @@ public class OmdbService implements MovieDatabase {
                 .map(row -> new SearchResult(row.title(), row.year(), row.imdbId()))
                 .collect(Collectors.toList());
     }
-
 
     @Override
     public List<String> getDirectors(String movieId) {

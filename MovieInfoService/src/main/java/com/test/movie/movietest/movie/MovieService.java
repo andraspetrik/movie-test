@@ -3,7 +3,6 @@ package com.test.movie.movietest.movie;
 import com.test.movie.movietest.aop.Logged;
 import com.test.movie.movietest.aop.LoggedExecutionTime;
 import com.test.movie.movietest.network.MovieDatabase;
-import com.test.movie.movietest.network.MovieDetails;
 import com.test.movie.movietest.network.omdb.OmdbService;
 import com.test.movie.movietest.network.themoviedb.TMDbService;
 import org.slf4j.Logger;
@@ -19,8 +18,9 @@ public class MovieService {
     private static final Logger log = LoggerFactory.getLogger(MovieService.class);
 
     private static final List<String> VALID_OMDB_API_NAMES = List.of("omdb", "omdbapi", "omdb_api");
-    OmdbService omdbService;
-    TMDbService TMDbService;
+
+    private final OmdbService omdbService;
+    private final TMDbService TMDbService;
 
     public MovieService(
             @Autowired OmdbService omdbService,
@@ -46,7 +46,7 @@ public class MovieService {
     }
 
     private MovieDatabase getMovieDatabase(String apiName) {
-        MovieDatabase movieDatabase = null;
+        MovieDatabase movieDatabase;
         if (VALID_OMDB_API_NAMES.contains(apiName)) {
             movieDatabase = omdbService;
         } else {

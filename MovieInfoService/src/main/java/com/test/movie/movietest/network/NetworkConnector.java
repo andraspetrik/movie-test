@@ -1,6 +1,5 @@
 package com.test.movie.movietest.network;
 
-import com.test.movie.movietest.network.themoviedb.TMDBCreditsResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -9,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Objects;
 
 @Component
 public class NetworkConnector {
