@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 public record OmdbSearchResult(
-        @JsonProperty("Search") Optional<List<OmdbSearchResultRow>> search
+        @JsonProperty("Search") Optional<List<OmdbSearchResultRow>> search,
+        @JsonProperty("totalResults") Integer totalResults,
+        @JsonProperty("Response") Boolean response
 ) {
 }
