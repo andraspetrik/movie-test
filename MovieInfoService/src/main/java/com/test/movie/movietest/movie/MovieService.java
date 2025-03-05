@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class MovieService {
@@ -36,12 +35,16 @@ public class MovieService {
 
     @LoggedExecutionTime
     @Logged
-    public Page<Movie> getMovies(String title, String apiName, Integer pageeInp) {
+    public Page<Movie> getMovies(String title, String apiName, String pageInp) {
 
         log.debug("title: {}", title);
         log.debug("apiName: {}", apiName);
 
-        final var pageNum = Optional.ofNullable(pageeInp).orElse(1);
+
+        var pageNum = 1;
+        try {
+            pageNum = Integer.parseInt(pageInp);
+        } catch (NumberFormatException e) { /* do nothing */ }
 
         final var movieDatabase = getMovieDatabase(apiName);
 

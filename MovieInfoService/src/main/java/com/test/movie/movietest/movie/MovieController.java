@@ -18,8 +18,8 @@ public class MovieController {
     @GetMapping("/movies/{movieTitle}")
     public GetMoviesResult getMovies(
             @PathVariable("movieTitle") String movieTitle,
-            @RequestParam("apiName") String apiName,
-            @RequestParam("page") Integer page
+            @RequestParam(value = "apiName", required = false) String apiName,
+            @RequestParam(value = "page", required = false) String page
     ) {
         var movies = movieService.getMovies(movieTitle, apiName, page);
         return new GetMoviesResult(movies);
