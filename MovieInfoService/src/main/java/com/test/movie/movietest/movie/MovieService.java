@@ -7,6 +7,7 @@ import com.test.movie.movietest.cache.MovieSearchResultRepository;
 import com.test.movie.movietest.network.MovieDatabase;
 import com.test.movie.movietest.network.omdb.OmdbService;
 import com.test.movie.movietest.network.themoviedb.TMDbService;
+import com.test.movie.movietest.statistics.StatisticsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MovieService {
@@ -29,16 +29,19 @@ public class MovieService {
 
     private final OmdbService omdbService;
     private final TMDbService TMDbService;
+    private final StatisticsService statisticsService;
 
     private final MovieSearchResultRepository movieSearchResultRepository;
 
     public MovieService(
             @Autowired OmdbService omdbService,
             @Autowired TMDbService TMDbService,
+            @Autowired StatisticsService statisticsService,
             @Autowired MovieSearchResultRepository movieSearchResultRepository
             ) {
         this.omdbService = omdbService;
         this.TMDbService = TMDbService;
+        this.statisticsService = statisticsService;
         this.movieSearchResultRepository = movieSearchResultRepository;
 
         // TODO it is only for development
@@ -53,6 +56,8 @@ public class MovieService {
         log.debug("apiName: {}", apiName);
 
         var pageNumber = parsePageNumber(pageInp);
+
+        statisticsService.savePattern(title, apiName, pageNumber);
 
         var key = title + "_" + apiName + "_" + pageNumber;
         var cachedSearch = movieSearchResultRepository.findById(key);
