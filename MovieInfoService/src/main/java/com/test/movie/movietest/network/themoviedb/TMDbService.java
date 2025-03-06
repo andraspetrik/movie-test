@@ -30,8 +30,6 @@ public class TMDbService implements MovieDatabase {
 
     @Override
     public Page<SearchResult> searhForMovies(String title, Integer pageNumber) {
-        // https://api.themoviedb.org/3/search/movie?api_key=<<api key>>&query=Avengers&include_adult=true
-
         String url = UriComponentsBuilder.fromUriString(BASE_URL + "/search/movie")
                 .queryParam("query", title)
                 .queryParam("api_key", apiKey)
