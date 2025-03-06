@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MovieService {
@@ -65,8 +66,12 @@ public class MovieService {
             final var movieDatabase = getMovieDatabase(apiName);
 
             var searchResult = movieDatabase.searhForMovies(title, pageNum);
-            var result = searchResult
-                    .map(row -> new Movie(row.title(), row.year(), movieDatabase.getDirectors(row.movieId())));
+
+            var result = new PageImpl<>(
+                    searchResult.stream().parallel().map(row -> new Movie(row.title(), row.year(), movieDatabase.getDirectors(row.movieId()))).toList(),
+                    PageRequest.of(pageNum, PAGE_SIZE),
+                    searchResult.getTotalElements()
+                    );
             movieSearchResultRepository.save(new MovieSearchResult(key, title, apiName, pageNum, result.getTotalElements(), result.getContent()));
             return result;
         } else {
