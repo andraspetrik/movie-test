@@ -52,33 +52,37 @@ public class MovieService {
         log.debug("title: {}", title);
         log.debug("apiName: {}", apiName);
 
+        var pageNumber = parsePageNumber(pageInp);
 
-        var pageNum = 1;
-        try {
-            pageNum = Integer.parseInt(pageInp);
-        } catch (NumberFormatException e) { /* do nothing */ }
-
-        var key = title + "_" + apiName + "_" + pageNum;
+        var key = title + "_" + apiName + "_" + pageNumber;
         var cachedSearch = movieSearchResultRepository.findById(key);
 
         if (cachedSearch.isEmpty()) {
             log.debug("No cachedSearch found for key: {}", key);
             final var movieDatabase = getMovieDatabase(apiName);
 
-            var searchResult = movieDatabase.searhForMovies(title, pageNum);
+            var searchResult = movieDatabase.searhForMovies(title, pageNumber);
 
             var result = new PageImpl<>(
                     searchResult.stream().parallel().map(row -> new Movie(row.title(), row.year(), movieDatabase.getDirectors(row.movieId()))).toList(),
-                    PageRequest.of(pageNum, PAGE_SIZE),
+                    PageRequest.of(pageNumber, PAGE_SIZE),
                     searchResult.getTotalElements()
                     );
-            movieSearchResultRepository.save(new MovieSearchResult(key, title, apiName, pageNum, result.getTotalElements(), result.getContent()));
+            movieSearchResultRepository.save(new MovieSearchResult(key, title, apiName, pageNumber, result.getTotalElements(), result.getContent()));
             return result;
         } else {
             log.debug("Found cachedSearch for key: {}", key);
             var cached = cachedSearch.get();
             return new PageImpl<>(cached.getMovies(), PageRequest.of(cached.getPage(), PAGE_SIZE), cached.getTotal());
         }
+    }
+
+    private int parsePageNumber(String pageNumberString) {
+        var pageNum = 1;
+        try {
+            pageNum = Integer.parseInt(pageNumberString);
+        } catch (NumberFormatException e) { /* do nothing */ }
+        return pageNum;
     }
 
     private MovieDatabase getMovieDatabase(String apiName) {
