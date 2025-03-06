@@ -16,19 +16,11 @@ public class AspectExtender {
 
     @Around("@annotation(com.test.movie.movietest.aop.Logged)")
     public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
-
-        // TODO Delete this
-//        var signature = (MethodSignature) joinPoint.getSignature();
-//        var method = signature.getMethod();
-//        var annotation = (Logged) method.getAnnotation(Logged.class);
-
         var methodName = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
 
         log.debug("[@Logged] {}", methodName);
 
-        Object result = joinPoint.proceed();
-
-        return result;
+        return joinPoint.proceed();
     }
 
     @Around("@annotation(com.test.movie.movietest.aop.LoggedExecutionTime)")
