@@ -1,6 +1,7 @@
 package com.test.movie.movietest.statistics;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ public class StatisticsService {
         this.searchPatternRepository = searchPatternRepository;
     }
 
+    @Async
     public void savePattern(String title, String apiName, Integer pageNumber) {
         var searchPattern = new SearchPattern();
         searchPattern.setTitle(title);
