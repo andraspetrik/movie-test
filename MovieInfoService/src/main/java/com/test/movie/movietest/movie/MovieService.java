@@ -2,6 +2,8 @@ package com.test.movie.movietest.movie;
 
 import com.test.movie.movietest.aop.Logged;
 import com.test.movie.movietest.aop.LoggedExecutionTime;
+import com.test.movie.movietest.cache.MovieSearchResult;
+import com.test.movie.movietest.cache.MovieSearchResultRepository;
 import com.test.movie.movietest.network.MovieDatabase;
 import com.test.movie.movietest.network.omdb.OmdbService;
 import com.test.movie.movietest.network.themoviedb.TMDbService;
@@ -9,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,12 +29,19 @@ public class MovieService {
     private final OmdbService omdbService;
     private final TMDbService TMDbService;
 
+    private final MovieSearchResultRepository movieSearchResultRepository;
+
     public MovieService(
             @Autowired OmdbService omdbService,
-            @Autowired TMDbService TMDbService
+            @Autowired TMDbService TMDbService,
+            @Autowired MovieSearchResultRepository movieSearchResultRepository
             ) {
         this.omdbService = omdbService;
         this.TMDbService = TMDbService;
+        this.movieSearchResultRepository = movieSearchResultRepository;
+
+        // TODO it is only for development
+        movieSearchResultRepository.deleteAll();
     }
 
     @LoggedExecutionTime
@@ -46,12 +57,23 @@ public class MovieService {
             pageNum = Integer.parseInt(pageInp);
         } catch (NumberFormatException e) { /* do nothing */ }
 
-        final var movieDatabase = getMovieDatabase(apiName);
+        var key = title + "_" + apiName + "_" + pageNum;
+        var cachedSearch = movieSearchResultRepository.findById(key);
 
-        var searchResult = movieDatabase.searhForMovies(title, pageNum);
+        if (cachedSearch.isEmpty()) {
+            log.debug("No cachedSearch found for key: {}", key);
+            final var movieDatabase = getMovieDatabase(apiName);
 
-        return searchResult
-                .map(row -> new Movie(row.title(), row.year(), movieDatabase.getDirectors(row.movieId())));
+            var searchResult = movieDatabase.searhForMovies(title, pageNum);
+            var result = searchResult
+                    .map(row -> new Movie(row.title(), row.year(), movieDatabase.getDirectors(row.movieId())));
+            movieSearchResultRepository.save(new MovieSearchResult(key, title, apiName, pageNum, result.getTotalElements(), result.getContent()));
+            return result;
+        } else {
+            log.debug("Found cachedSearch for key: {}", key);
+            var cached = cachedSearch.get();
+            return new PageImpl<>(cached.getMovies(), PageRequest.of(cached.getPage(), PAGE_SIZE), cached.getTotal());
+        }
     }
 
     private MovieDatabase getMovieDatabase(String apiName) {
