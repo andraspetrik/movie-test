@@ -115,4 +115,30 @@ class MovieServiceTest {
         assertNotNull(result);
         verify(omdbService, times(1)).searhForMovies(title, 1);
     }
+
+    @Test
+    void testGetMovies_TMDb_NotCached() {
+        // Given
+        String title = "New Movie";
+        String apiName = "tmdb";
+        String pageInp = "1";
+        String key = title + "_" + apiName + "_1";
+
+        when(movieSearchResultRepository.findById(key)).thenReturn(Optional.empty());
+        when(tmDbService.searhForMovies(title, 1)).thenReturn(
+                new PageImpl<>(List.of(new SearchResult("New Movie", "2024", "id1")))
+        );
+        when(tmDbService.getDirectors("id1")).thenReturn(List.of("Director B"));
+
+        // When
+        Page<Movie> result = movieService.getMovies(title, apiName, pageInp);
+
+        // Then
+        assertNotNull(result);
+        assertEquals("New Movie", result.getContent().getFirst().title());
+        verify(movieSearchResultRepository, times(1)).findById(key);
+        verify(tmDbService, times(1)).searhForMovies(title, 1);
+        verify(tmDbService, times(1)).getDirectors("id1");
+        verify(movieSearchResultRepository, times(1)).save(any(MovieSearchResult.class));
+    }
 }
