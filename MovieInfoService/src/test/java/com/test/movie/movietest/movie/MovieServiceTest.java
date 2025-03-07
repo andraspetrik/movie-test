@@ -7,7 +7,8 @@ import com.test.movie.movietest.cache.MovieSearchResultRepository;
 import com.test.movie.movietest.network.SearchResult;
 import com.test.movie.movietest.network.omdb.OmdbService;
 import com.test.movie.movietest.network.themoviedb.TMDbService;
-import com.test.movie.movietest.statistics.StatisticsService;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +34,10 @@ class MovieServiceTest {
     private TMDbService tmDbService;
 
     @Mock
-    private StatisticsService statisticsService;
+    private MeterRegistry meterRegistry;
+
+    @Mock
+    private Counter counter;
 
     @Mock
     private MovieSearchResultRepository movieSearchResultRepository;
@@ -54,6 +58,16 @@ class MovieServiceTest {
         String apiName = "omdb";
         String pageInp = "1";
         String key = title + "_" + apiName + "_1";
+
+        when(meterRegistry.counter(
+                "movieservice.trafficstat.total",
+                "title",
+                "Test Movie",
+                "apiName",
+                "omdb",
+                "pageNumber",
+                "1"
+        )).thenReturn(counter);
 
         List<Movie> movies = List.of(new Movie("Test Movie", "2024", List.of("Director A")));
 
@@ -77,6 +91,16 @@ class MovieServiceTest {
         String apiName = "omdb";
         String pageInp = "1";
         String key = title + "_" + apiName + "_1";
+
+        when(meterRegistry.counter(
+                "movieservice.trafficstat.total",
+                "title",
+                "New Movie",
+                "apiName",
+                "omdb",
+                "pageNumber",
+                "1"
+        )).thenReturn(counter);
 
         when(movieSearchResultRepository.findById(key)).thenReturn(Optional.empty());
         when(omdbService.searhForMovies(title, 1)).thenReturn(
@@ -103,6 +127,16 @@ class MovieServiceTest {
         String apiName = "omdb";
         String pageInp = "invalid";
 
+        when(meterRegistry.counter(
+                "movieservice.trafficstat.total",
+                "title",
+                "Test Movie",
+                "apiName",
+                "omdb",
+                "pageNumber",
+                "1"
+        )).thenReturn(counter);
+
         when(movieSearchResultRepository.findById(any())).thenReturn(Optional.empty());
         when(omdbService.searhForMovies(title, 1)).thenReturn(
                 new PageImpl<>(List.of(new SearchResult("Test Movie", "2024", "id1")))
@@ -123,6 +157,16 @@ class MovieServiceTest {
         String apiName = "tmdb";
         String pageInp = "1";
         String key = title + "_" + apiName + "_1";
+
+        when(meterRegistry.counter(
+                "movieservice.trafficstat.total",
+                "title",
+                "New Movie",
+                "apiName",
+                "tmdb",
+                "pageNumber",
+                "1"
+        )).thenReturn(counter);
 
         when(movieSearchResultRepository.findById(key)).thenReturn(Optional.empty());
         when(tmDbService.searhForMovies(title, 1)).thenReturn(
