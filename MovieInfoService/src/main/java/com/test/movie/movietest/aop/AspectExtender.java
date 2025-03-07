@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
+import java.util.Arrays;
+
 @Aspect
 @Component
 public class AspectExtender {
@@ -18,7 +20,7 @@ public class AspectExtender {
     public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
         var methodName = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
 
-        log.debug("[@Logged] {}", methodName);
+        log.debug("[@Logged] {}", methodName + "with argument[s] = " + Arrays.toString(joinPoint.getArgs()));
 
         return joinPoint.proceed();
     }
