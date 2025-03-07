@@ -1,0 +1,79 @@
+{
+	"info": {
+		"_postman_id": "2aba089e-a4f2-4daa-ab0f-a55ffb49418f",
+		"name": "Basic testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13570599"
+	},
+	"item": [
+		{
+			"name": "movies - omdb",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/movies/Avengers?apiName",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"movies",
+						"Avengers"
+					],
+					"query": [
+						{
+							"key": "apiName",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "movies - themoviedb",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/movies/Avengers?apiName",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"movies",
+						"Avengers"
+					],
+					"query": [
+						{
+							"key": "apiName",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "movies - tdefault",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/movies/Avengers",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"movies",
+						"Avengers"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
