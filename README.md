@@ -17,6 +17,13 @@ Install prometheus for development
 
 ## Deploy
 
-To deploy the application, run command:
+To deploy the application, run command in the root of the project:
 
 `docker-compose up`
+
+## Testing the API
+
+Please find the [Basic testing.postman_collection.json](Basic%20testing.postman_collection.json) in the project. 
+Import it to your Postman workspace, and run the items of the collection. 
+
+
