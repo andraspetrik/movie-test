@@ -52,9 +52,6 @@ public class MovieService {
     @Logged
     public Page<Movie> getMovies(String title, String apiName, String pageInp) {
 
-        log.debug("title: {}", title);
-        log.debug("apiName: {}", apiName);
-
         var pageNumber = parsePageNumber(pageInp);
 
         statisticsService.savePattern(title, apiName, pageNumber);
