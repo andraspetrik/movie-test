@@ -5,6 +5,7 @@ import com.test.movie.movietest.aop.LoggedExecutionTime;
 import com.test.movie.movietest.cache.MovieSearchResult;
 import com.test.movie.movietest.cache.MovieSearchResultRepository;
 import com.test.movie.movietest.network.MovieDatabase;
+import com.test.movie.movietest.network.NetworkException;
 import com.test.movie.movietest.network.omdb.OmdbService;
 import com.test.movie.movietest.network.themoviedb.TMDbService;
 import com.test.movie.movietest.statistics.StatisticsService;
@@ -43,9 +44,6 @@ public class MovieService {
         this.TMDbService = TMDbService;
         this.statisticsService = statisticsService;
         this.movieSearchResultRepository = movieSearchResultRepository;
-
-        // TODO it is only for development
-        movieSearchResultRepository.deleteAll();
     }
 
     @LoggedExecutionTime
@@ -54,9 +52,9 @@ public class MovieService {
 
         var pageNumber = parsePageNumber(pageInp);
 
-        statisticsService.savePattern(title, apiName, pageNumber);
-
         var key = title + "_" + apiName + "_" + pageNumber;
+
+        statisticsService.savePattern(title, apiName, pageNumber);
         var cachedSearch = movieSearchResultRepository.findById(key);
 
         if (cachedSearch.isEmpty()) {

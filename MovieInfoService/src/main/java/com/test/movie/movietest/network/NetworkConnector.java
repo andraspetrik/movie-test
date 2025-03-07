@@ -1,5 +1,7 @@
 package com.test.movie.movietest.network;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +14,8 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class NetworkConnector {
 
+    private static final Logger log = LoggerFactory.getLogger(NetworkConnector.class);
+
     private final RestTemplate restTemplate;
 
     public NetworkConnector(@Autowired RestTemplate restTemplate) {
@@ -23,20 +27,17 @@ public class NetworkConnector {
                 url, HttpMethod.GET, new HttpEntity<Void>(null, new HttpHeaders()),
                 responseType);
 
-        System.out.println("Status: " + response.getStatusCode());
+        log.debug("Status: {}", response.getStatusCode());
 
         if (response.getStatusCode() != HttpStatus.OK) {
-            System.out.println("Error: " + response.getStatusCode());
-//            throw new Exception("Can not reach external API!");
-            // TODO Handle this
+            log.debug("Error: {}", response.getStatusCode());
+            throw new NetworkException("Can not reach external API!");
         }
-
-        System.out.println(response); // TODO remove it
 
         var body = response.getBody();
 
         if (body == null) {
-            // TODO Handle this
+            throw new NetworkException("No response from external API!");
         }
 
         return body;
