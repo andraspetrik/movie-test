@@ -7,7 +7,7 @@ services:
       - "6379:6379"
     networks:
       - my_network
-  movietest-movieinfo:
+  movieinfo:
     build:
       context: .
       dockerfile: Dockerfile
@@ -21,7 +21,7 @@ services:
       - my_network
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: movietest-prometheus
     ports:
       - "9090:9090"
     volumes:
