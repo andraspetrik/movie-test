@@ -1,19 +1,31 @@
 version: '3.8'
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql_container
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: movie_test
-      MYSQL_USER: default_user
-      MYSQL_PASSWORD: password
+  redis:
+    image: redis
+    container_name: movietest-redis
     ports:
-      - "3306:3306"
+      - "6379:6379"
+    networks:
+      - my_network
+  movietest-movieinfo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: movietest-movieinfo
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    networks:
+      - my_network
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - my_network
 

@@ -5,10 +5,9 @@ import com.test.movie.movietest.aop.LoggedExecutionTime;
 import com.test.movie.movietest.cache.MovieSearchResult;
 import com.test.movie.movietest.cache.MovieSearchResultRepository;
 import com.test.movie.movietest.network.MovieDatabase;
-import com.test.movie.movietest.network.NetworkException;
 import com.test.movie.movietest.network.omdb.OmdbService;
 import com.test.movie.movietest.network.themoviedb.TMDbService;
-import com.test.movie.movietest.statistics.StatisticsService;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,20 +29,21 @@ public class MovieService {
 
     private final OmdbService omdbService;
     private final TMDbService TMDbService;
-    private final StatisticsService statisticsService;
+
+    private final MeterRegistry meterRegistry;
 
     private final MovieSearchResultRepository movieSearchResultRepository;
 
     public MovieService(
             @Autowired OmdbService omdbService,
             @Autowired TMDbService TMDbService,
-            @Autowired StatisticsService statisticsService,
-            @Autowired MovieSearchResultRepository movieSearchResultRepository
+            @Autowired MovieSearchResultRepository movieSearchResultRepository,
+            @Autowired MeterRegistry meterRegistry
             ) {
         this.omdbService = omdbService;
         this.TMDbService = TMDbService;
-        this.statisticsService = statisticsService;
         this.movieSearchResultRepository = movieSearchResultRepository;
+        this.meterRegistry = meterRegistry;
     }
 
     @LoggedExecutionTime
@@ -54,7 +54,7 @@ public class MovieService {
 
         var key = title + "_" + apiName + "_" + pageNumber;
 
-        statisticsService.savePattern(title, apiName, pageNumber);
+        meterRegistry.counter("movieservice.trafficstat.total", "title", title, "apiName", apiName, "pageNumber", pageNumber + "").increment(1);
         var cachedSearch = movieSearchResultRepository.findById(key);
 
         if (cachedSearch.isEmpty()) {
